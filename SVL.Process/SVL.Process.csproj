@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Title>SVL Process</Title>
+        <Description>An easy way to get output from a process in a one-liner.</Description>
+        <Copyright>Science Viking Labs LLC</Copyright>
+    </PropertyGroup>
+
+</Project>
