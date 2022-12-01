@@ -34,7 +34,7 @@ jobs:
         run: |
           mkdir -p packages
           dotnet nuget add source --username ${{ github.actor }} --password "${{ secrets.GITHUB_TOKEN }}" --store-password-in-clear-text --name github "https://nuget.pkg.github.com/ScienceVikings/index.json"
-          dotnet nuget add source --username ${{ github.actor }} --password "${{ secrets.NUGET_API_KEY }}" --store-password-in-clear-text --name nuget "https://api.nuget.org/v3/index.json"
+          dotnet nuget add source --username ${{ github.actor }} --password "${{ secrets.NUGET_API_KEY }}" --store-password-in-clear-text --name svlnuget "https://api.nuget.org/v3/index.json"
           dotnet pack --configuration Release -o packages /p:VERSION="${{ steps.version.outputs.semVer }}"
           dotnet nuget push "packages/SVL.Process.${{ steps.version.outputs.semVer }}.nupkg" --api-key "${{ secrets.GITHUB_TOKEN }}" --source github
-          dotnet nuget push "packages/SVL.Process.${{ steps.version.outputs.semVer }}.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source nuget
+          dotnet nuget push "packages/SVL.Process.${{ steps.version.outputs.semVer }}.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source svlnuget
