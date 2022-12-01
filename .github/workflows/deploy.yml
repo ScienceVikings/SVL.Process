@@ -29,5 +29,5 @@ jobs:
         run: |
           mkdir -p packages
           dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ env.GITHUB_REPOSITORY_OWNER }}/index.json"
-          dotnet pack --configuration Release -o packages -p:VERSION="${{ steps.gitversion.outputs.semVer }}"
-          dotnet nuget push "packages/SVL.Process.${{ steps.gitversion.outputs.semVer }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source github
+          dotnet pack --configuration Release -o packages /p:VERSION="${{ steps.version.outputs.semVer }}"
+          dotnet nuget push "packages/SVL.Process.${{ steps.version.outputs.semVer }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source github
