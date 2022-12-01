@@ -27,7 +27,7 @@ jobs:
       - name: Build Release Package
         shell: bash
         run: |
-          mkdir -p package
-          dotnet nuget add source --username jbasinger --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ env.GITHUB_REPOSITORY_OWNER }}/index.json"
-          dotnet pack --configuration Release -p:VERSION=${{ steps.gitversion.outputs.semVer }} -o packages
-          dotnet nuget push "SVL.Process.${{ github.ref_name }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
+          mkdir -p packages
+          dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ env.GITHUB_REPOSITORY_OWNER }}/index.json"
+          dotnet pack --configuration Release -o packages -p:VERSION="${{ steps.gitversion.outputs.semVer }}""
+          dotnet nuget push "packages/SVL.Process.${{ steps.gitversion.outputs.semVer }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source github
