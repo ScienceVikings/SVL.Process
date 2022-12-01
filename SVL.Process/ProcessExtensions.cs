@@ -31,12 +31,13 @@ public static class Process
 
         if (environmentVariables.Count > 0)
             foreach (var kvp in environmentVariables)
-                startInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
+                startInfo.EnvironmentVariables.Add(kvp.Key, kvp.Value);
 
         var promise = new TaskCompletionSource<string>();
         var outputData = new StringBuilder();
         var exited = false;
         var emptyOutput = false;
+        var promiseSet = false;
 
         var proc = new System.Diagnostics.Process();
         proc.StartInfo = startInfo;
@@ -45,27 +46,43 @@ public static class Process
         //This is a little wild because there is no guaranteed order these get fired in, so you need to check for like, everything everywhere.
         proc.Exited += (_, _) =>
         {
-            exited = true;
+            lock (promise)
+            {
+                exited = true;
 
-            if (emptyOutput && exited)
-                promise.SetResult(outputData.ToString());
+                if (emptyOutput && exited && !promiseSet)
+                {
+                    promise.SetResult(outputData.ToString());
+                    promiseSet = true;
+                }
+            }
         };
         
         proc.OutputDataReceived += (_, args) =>
         {
-            if (!string.IsNullOrWhiteSpace(args.Data))
-                outputData.Append(args.Data);
-            else
-                emptyOutput = true;
+            lock(promise){
+                if (!string.IsNullOrWhiteSpace(args.Data))
+                    outputData.Append(args.Data);
+                else
+                    emptyOutput = true;
 
-            if (emptyOutput && exited)
-                promise.SetResult(outputData.ToString());
+                if (emptyOutput && exited && !promiseSet)
+                {
+                    promise.SetResult(outputData.ToString());
+                    promiseSet = true;
+                }
+            }
         };
         
         proc.ErrorDataReceived += (_, args) =>
         {
-            if (!string.IsNullOrWhiteSpace(args.Data))
-                promise.SetException(new Exception(args.Data));
+            lock(promise){
+                if (!string.IsNullOrWhiteSpace(args.Data) && !promiseSet)
+                {
+                    promise.SetException(new Exception(args.Data));
+                    promiseSet = true;
+                }
+            }
         };
         
         proc.Start();
