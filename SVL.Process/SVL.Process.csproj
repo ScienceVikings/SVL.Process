@@ -7,6 +7,8 @@
         <Title>SVL Process</Title>
         <Description>An easy way to get output from a process in a one-liner.</Description>
         <Copyright>Science Viking Labs LLC</Copyright>
+        <RepositoryUrl>https://github.com/ScienceVikings/SVL.Process.git</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
     </PropertyGroup>
 
 </Project>
