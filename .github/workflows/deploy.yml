@@ -2,10 +2,6 @@ name: Deploy
 
 on:
   push:
-    branches-ignore:
-      - main
-    tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   build-and-deploy-package:
@@ -13,28 +9,25 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: '5.x'
+
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Determine Version
+        id: version
+        uses: gittools/actions/gitversion/execute@v0.9.7
 
       - name: Build Release Package
-        if: ${{ github.ref_type }} == 'tag'
         shell: bash
-        runs: |
-          mkdir -p package
-          dotnet nuget add source --username jbasinger --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ env.GITHUB_REPOSITORY_OWNER }}/index.json"
-          dotnet pack --configuration Release -p:VERSION=${{ github.ref_name }} -o packages
-          if [ -f "SVL.Process.${{ github.ref_name }}.nupkg" ]; then
-            dotnet nuget push "SVL.Process.${{ github.ref_name }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
-          else
-            git push --delete origin ${{ github.ref_name }}
-            echo "Solution version does not match tag. Package not pushed and tag deleted."
-            return 1
-          fi
-
-      - name: Build Pre-Release Package
-        if: ${{ github.ref_type }} == 'branch'
-        shell: bash
-        runs: |
-          dotnet nuget add source --username jbasinger --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ env.GITHUB_REPOSITORY_OWNER }}/index.json"
-          dotnet pack --configuration Release --version-suffix ${{ github.ref_name }} -o packages
-          dotnet nuget push packages --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
+        run: |
+          mkdir -p packages
+          dotnet nuget add source --username ${{ github.actor }} --password "${{ secrets.GITHUB_TOKEN }}" --store-password-in-clear-text --name github "https://nuget.pkg.github.com/ScienceVikings/index.json"
+          dotnet pack --configuration Release -o packages /p:VERSION="${{ steps.version.outputs.semVer }}"
+          dotnet nuget push "packages/SVL.Process.${{ steps.version.outputs.semVer }}.nupkg" --api-key "${{ secrets.GITHUB_TOKEN }}" --source github
