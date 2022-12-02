@@ -32,7 +32,16 @@ jobs:
       - name: Build Release Package
         shell: bash
         run: |
+          
           mkdir -p packages
           dotnet pack --configuration Release -o packages /p:VERSION="${{ steps.version.outputs.semVer }}"
-          dotnet nuget push "packages/SVL.Process.${{ steps.version.outputs.semVer }}.nupkg" --api-key "${{ secrets.GITHUB_TOKEN }}" --source "https://nuget.pkg.github.com/ScienceVikings/index.json" --skip-duplicate
-          dotnet nuget push "packages/SVL.Process.${{ steps.version.outputs.semVer }}.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+
+          dotnet nuget push "packages/SVL.Process.${{ steps.version.outputs.semVer }}.nupkg" \
+            --api-key "${{ secrets.GITHUB_TOKEN }}" \
+            --source "https://nuget.pkg.github.com/ScienceVikings/index.json" \
+            --skip-duplicate
+
+          dotnet nuget push "packages/SVL.Process.${{ steps.version.outputs.semVer }}.nupkg" \
+            --api-key "${{ secrets.NUGET_API_KEY }}" \
+            --source "https://api.nuget.org/v3/index.json" \
+            --skip-duplicate
