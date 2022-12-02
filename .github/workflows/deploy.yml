@@ -39,11 +39,9 @@ jobs:
           dotnet nuget push "packages/SVL.Process.${{ steps.version.outputs.semVer }}.nupkg" \
             --api-key "${{ secrets.GITHUB_TOKEN }}" \
             --source "https://nuget.pkg.github.com/ScienceVikings/index.json" \
-            --readme README.md \
             --skip-duplicate
 
           dotnet nuget push "packages/SVL.Process.${{ steps.version.outputs.semVer }}.nupkg" \
             --api-key "${{ secrets.NUGET_API_KEY }}" \
             --source "https://api.nuget.org/v3/index.json" \
-            --readme README.md \
             --skip-duplicate

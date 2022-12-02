@@ -9,6 +9,10 @@
         <Copyright>Science Viking Labs LLC</Copyright>
         <RepositoryUrl>https://github.com/ScienceVikings/SVL.Process.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
-
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
 </Project>
